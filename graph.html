@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>demo-graph</title>
+	<link rel="stylesheet" type="text/css" href="css/style.css"/>
+</head>
+<body>
+	<div id="demo">
+		<!-- 列表 -->
+		<ul class="item bold">
+			<li 
+			v-for="item, index in items"
+			@click="showGraph(item)">{{item}}</li>
+		</ul>
+		<!-- 图表容器 -->
+		<div id="container" v-show="isShow"></div>
+	</div>
+	<script src="js/vue.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+	<script type="text/javascript">
+		let option = {
+			title: {
+				text: "知识图谱",
+				top: "top",
+				left: "left",
+			},
+			series: [{
+				name: '知识图谱',
+				type: 'graph',
+				// 各个节点使用引力相连
+				layout: 'force',
+				// 力的参数设置
+				force: {
+					// 斥力因子
+					repulsion: 1000,
+					// 引力因子
+					gravity: 0.2,
+					// 节点距离
+					edgeLength: 15,
+					// 迭代动画
+					layoutAnimation: true,
+				},
+				// 节点大小
+				symbolSize: 60,
+				// 动态改变图时需改变下面三个数据项
+				data: [],
+				links: [],
+				// categories: legends,
+				categories: [],
+				label: {
+					show: true,
+					fontSize: 16,
+					fontStyle: '600'
+				},
+				lineStyle: {
+					// 透明度
+					opacity: 0.9,
+					// 线宽
+					width: 1.5
+				}
+			}]
+		};
+		var vm = new Vue({
+			el: "#demo",
+			data: {
+				items: ['FRR','代料','询问'],
+				isShow: false,
+				// 知识图谱数据
+				listdata: [],
+				// 图谱关联
+				links: [],
+				// 图谱legend
+				texts: [],
+				option: option,
+				myChart: '',
+				itemData: {
+					'FRR': {
+						legends: ['frr1', 'frr2', 'frr3'],
+						data: [
+							['frr1.1', 'frr1.2', 'frr1.3'],
+							['frr2.1', 'frr2.2', 'frr2.3'],
+							['frr3.1', 'frr3.2', 'frr3.3']
+						]
+					},
+					'代料': {
+						legends: ['dl1', 'dl2', 'dl3'],
+						data: [
+							['dl1.1', 'dl1.2', 'dl1.3'],
+							['dl2.1', 'dl2.2', 'dl2.3'],
+							['dl3.1', 'dl3.2', 'dl3.3']
+						]
+					},
+					'询问': {
+						legends: ['xw1', 'xw2', 'xw3'],
+						data: [
+							['xw1.1', 'xw1.2', 'xw1.3'],
+							['xw2.1', 'xw2.2', 'xw2.3'],
+							['xw3.1', 'xw3.2', 'xw3.3']
+						]
+					}
+				}
+			},
+			methods: {
+				// 列表点击事件
+				showGraph: function(item) {
+					// 首先置空三个变量
+					this.listdata = [];
+					this.links = [];
+					this.texts = [];
+					// 初始化echarts
+					this.myChart = echarts.init(document.getElementById("container"));
+					// 从itemData中获取点击的列表相关数据
+					let legends = this.itemData[item].legends,
+						data = this.itemData[item].data;
+					// 调用setTexts函数，设置option的categories
+					this.setTexts(legends);
+					this.texts.push({'name': item});
+					// 设置option的data和links
+					for (let i = 0; i < legends.length; i++) {
+						this.setData(legends[i], i);
+						for (let j = 0; j < data[i].length; j++) {
+							this.setData(data[i][j], i);
+							this.setLinkData(data[i][j], legends[i]);
+						}
+						this.setLinkData(legends[i], item);
+					}
+					this.setData(item, legends.length);
+					// 将计算得到的数据赋给option中的对应对象
+					this.option.series[0].data = this.listdata;
+					this.option.series[0].links = this.links;
+					this.option.series[0].categories = this.texts;
+					// 设置myChart
+					this.myChart.setOption(this.option);
+					// 使图表显示
+					this.isShow = true;
+				},
+				// 设置option的data
+				setData: function(arr, n) {
+					this.listdata.push({
+						"name": arr,
+						"category": n,
+						"draggable": "true"
+					})
+				},
+				// 设置option的links
+				setLinkData: function(arr, title) {
+					this.links.push({
+						"source": arr,
+						"target": title,
+						lineStyle: {
+							// 连接线的颜色与数据源相同
+							color: 'source',
+						}
+					})
+				},
+				// 设置option的categories
+				setTexts: function(arr) {
+					for (var i = 0; i < arr.length; i++) {
+						this.texts.push({
+							"name": arr[i],
+						})
+					}
+				},
+			}
+		});
+	</script>
+</body>
+</html>

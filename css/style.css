@@ -1,0 +1,40 @@
+body {
+  font-family: Menlo, Consolas, monospace;
+  color: #444;
+}
+.item {
+  cursor: pointer;
+}
+.bold {
+  font-weight: bold;
+}
+ul {
+	/* margin: auto; */
+	width: 100px;
+	/* padding-left: 2em; */
+	line-height: 2em;
+	list-style-type: dot;
+	font-size: 20px;
+	/* display: inline-block; */
+	/* border: 1px solid; */
+	/* float: left; */
+}
+
+#container{
+	width: 800px;
+	height: 600px;
+	margin: auto;
+/* 	margin-right: 300px;
+	margin-top: 50px;
+	float: right; */
+	/* display: inline-block; */
+	border: 1px solid #999;
+}
+#demo {
+	margin: auto;
+	width: 70%;
+	height: 100%;
+	/* margin-left: 10%; */
+	/* text-align: center; */
+	/* border: 1px solid; */
+}
